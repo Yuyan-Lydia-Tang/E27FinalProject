@@ -84,7 +84,26 @@ class colorSchemeCategorizer:
 					
 					try:
 						image_rgb = cv2.imread(imageFilenameRoot + line[0]+".jpg")
-						image_rgb = cv2.resize(image_rgb, (w,h), image_rgb, 0, 0, cv2.INTER_LANCZOS4)	
+
+						image_rgb = cv2.resize(image_rgb, (w,h), image_rgb, 0, 0, cv2.INTER_LANCZOS4)
+
+						color_copy = image_rgb.copy()
+						
+						# create a blank, white subtraction image
+						subtraction = 255*(numpy.ones((h, w, 3), 'uint8'))
+
+						# subtract the white background
+						subtracted = cv2.absdiff(subtraction,color_copy) 
+
+						# threshold the subtraction result to get a mask
+						ret,mask = cv2.threshold(subtracted,10,255,cv2.THRESH_BINARY)
+						color_copy = color_copy.astype(numpy.uint16)
+						bmask = mask.view(numpy.bool)
+
+						color_copy[:] = 1000
+
+						color_copy[bmask] = image_rgb[bmask]
+						image_rgb = color_copy
 					except:
 						continue
 					num_clothes += 1

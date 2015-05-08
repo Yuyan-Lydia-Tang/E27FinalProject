@@ -1,4 +1,4 @@
-# MatchingColor Documentation
+# Documentation
 
 List of Files:
 1.      Library (These files are not meant to be modified)
@@ -51,7 +51,7 @@ List of Files:
         * Note: deepfashion.org visualizes the clustering using the file visualization.json.
 
 
-There are three parts in this project that are worth to look at in details:
+# There are three parts in this project that are worth to look at in details:
         1. color.py
 
         2. clothesAdvisor.py
@@ -60,5 +60,5 @@ There are three parts in this project that are worth to look at in details:
 
 
 
-I hope this overview of the files contained in this project is clear and helpful. And if you have further questions regarding the details of code, please see comments in each file. In each file, the header part explains the general purpose of it in details, and important sections are commented as well.
+# I hope this overview of the files contained in this project is clear and helpful. And if you have further questions regarding the details of code, please see comments in each file. In each file, the header part explains the general purpose of it in details, and important sections are commented as well.
 

@@ -20,7 +20,7 @@ class colorSchemeCategorizer:
 		self.article_list = article_list
 		self.initializeData()
 		self.getNoiseList(noiseFile)
-		self.K = 20
+		self.K = 30
 		self.P = 10
 
 
@@ -75,17 +75,44 @@ class colorSchemeCategorizer:
 				
 				# ignore noise images
 				if line[0] in self.noise_list:
-					# print "noise"
+					print "skip noise lg-" + line[0]
 					continue
 
 				if line[1].lower() in article_list[article_index]:
-					if num_clothes >= 100:
+					if num_clothes >= 50:
 						continue
 					
 					try:
+						print imageFilenameRoot + line[0]+".jpg"
 						image_rgb = cv2.imread(imageFilenameRoot + line[0]+".jpg")
-						image_rgb = cv2.resize(image_rgb, (w,h), image_rgb, 0, 0, cv2.INTER_LANCZOS4)	
+
+
+						image_rgb = cv2.resize(image_rgb, (w,h), image_rgb, 0, 0, cv2.INTER_LANCZOS4)
+
+
+						color_copy = image_rgb.copy()
+						
+						# create a blank, white subtraction image
+						subtraction = 255*(numpy.ones((h, w, 3), 'uint8'))
+
+						# subtract the white background
+						subtracted = cv2.absdiff(subtraction,color_copy) 
+
+						# threshold the subtraction result to get a mask
+						ret,mask = cv2.threshold(subtracted,10,255,cv2.THRESH_BINARY)
+						color_copy = color_copy.astype(numpy.uint16)
+						bmask = mask.view(numpy.bool)
+
+						color_copy[:] = 1000
+
+						color_copy[bmask] = image_rgb[bmask]
+						image_rgb = color_copy
+
+
+ 
+
 					except:
+						print "except"
 						continue
 					num_clothes += 1
 					image_index.append((line[0],category_text))
@@ -96,13 +123,21 @@ class colorSchemeCategorizer:
 					image_pixels = image_rgb.reshape((-1,3))
 					# convert to np.float32
 					image_pixels = numpy.float32(image_pixels)
+
 					# append the image_pixels to a large matrix
 					if allpixel.size < 4:
 						allpixel = image_pixels
 					else:
 						allpixel = numpy.concatenate((allpixel, image_pixels))
 
+
 			target.close()
+			print allpixel.shape
+
+
+
+
+
 			print "Loaded", num_clothes, article_text[article_index]
 			# define criteria, number of clusters(K) and apply kmeans()
 			criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
